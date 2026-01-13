@@ -47,6 +47,27 @@ export function applyFilter(request: AbsenceRequest, filter: Filter): boolean {
       return applyDateFilter(request.endDate, operator, value);
     }
     
+    case 'custom_tag': {
+      // Custom tag filtering - check request.tags
+      const tagKey = filter.tagKey;
+      if (!tagKey || !request.tags) {
+        // No tag key or no tags on request - filter based on operator
+        if (operator === 'is' || operator === 'is_any_of') return false;
+        if (operator === 'is_not' || operator === 'is_none_of') return true;
+        return false;
+      }
+      
+      const requestTagValue = request.tags[tagKey];
+      if (!requestTagValue) {
+        // Request doesn't have this tag
+        if (operator === 'is' || operator === 'is_any_of') return false;
+        if (operator === 'is_not' || operator === 'is_none_of') return true;
+        return false;
+      }
+      
+      return applyStringFilter(requestTagValue, operator, value);
+    }
+    
     default:
       return true;
   }

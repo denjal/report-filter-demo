@@ -7,3 +7,4 @@ export { ScopeBranch } from './ScopeBranch';
 export { ScopeFilterBar, useScopeFilteredData } from './ScopeFilterBar';
 export { ScopedFilterDropdown } from './ScopedFilterDropdown';
 export { ScopedFilterValueSelector } from './ScopedFilterValueSelector';
+export { TagFilterDropdown } from './TagFilterDropdown';

@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { useScopeFilteredData } from './components/filters/ScopeFilterBar';
 import { ScopeBranch } from './components/filters/ScopeBranch';
 import { DataTable } from './components/table/DataTable';
 import { UserSelector } from './components/UserSelector';
 import { ThemeToggle } from './components/ThemeToggle';
+import { TagManagementModal } from './components/TagManagementModal';
 import { useUser } from './context/UserContext';
 import { absenceRequests } from './data/mock-data';
-import { CalendarDays, X } from 'lucide-react';
+import { CalendarDays, X, Tag } from 'lucide-react';
 import { Button } from './components/ui/Button';
 
 function AppContent() {
   const { currentUser } = useUser();
+  const [tagModalOpen, setTagModalOpen] = useState(false);
   const {
     filteredData,
     getFiltersForScope,
@@ -39,6 +42,15 @@ function AppContent() {
               </div>
             </div>
             <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setTagModalOpen(true)}
+                className="gap-2"
+              >
+                <Tag className="h-4 w-4" />
+                Manage Tags
+              </Button>
               <ThemeToggle />
               <UserSelector />
             </div>
@@ -84,8 +96,8 @@ function AppContent() {
               <ScopeBranch
                 scope={scope}
                 filters={getFiltersForScope(scope.id)}
-                onAddFilter={(type, operator, value) => 
-                  addFilterToScope(scope.id, type, operator, value)
+                onAddFilter={(type, operator, value, tagKey) => 
+                  addFilterToScope(scope.id, type, operator, value, tagKey)
                 }
                 onUpdateFilter={(filterId, updates) => 
                   updateFilterInScope(scope.id, filterId, updates)
@@ -94,6 +106,7 @@ function AppContent() {
                   removeFilterFromScope(scope.id, filterId)
                 }
                 onClearFilters={() => clearScopeFilters(scope.id)}
+                onManageTags={() => setTagModalOpen(true)}
               />
               
               {/* OR divider between scopes */}
@@ -128,6 +141,12 @@ function AppContent() {
         {/* Data table */}
         <DataTable data={filteredData} />
       </main>
+
+      {/* Tag Management Modal */}
+      <TagManagementModal
+        open={tagModalOpen}
+        onOpenChange={setTagModalOpen}
+      />
     </div>
   );
 }

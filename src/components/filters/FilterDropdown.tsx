@@ -37,7 +37,7 @@ interface FilterDropdownProps {
 
 type Step = 'select-type' | 'select-operator' | 'select-value';
 
-const filterTypeIcons: Record<FilterType, React.ReactNode> = {
+const filterTypeIcons: Partial<Record<FilterType, React.ReactNode>> = {
   status: <CircleDot className="h-4 w-4" />,
   department: <Building2 className="h-4 w-4" />,
   cost_center: <Wallet className="h-4 w-4" />,

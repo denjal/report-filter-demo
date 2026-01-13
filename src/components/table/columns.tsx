@@ -7,10 +7,12 @@ import {
   Ban,
   MapPin,
   Building2,
+  Tag,
 } from 'lucide-react';
 import { Badge } from '../ui/Badge';
 import { cn } from '../../lib/cn';
 import type { AbsenceRequest, AbsenceStatus, EmploymentType } from '../../types/filters';
+import { defaultCustomTags } from '../../data/mock-data';
 
 const columnHelper = createColumnHelper<AbsenceRequest>();
 
@@ -208,6 +210,47 @@ export const columns = [
       );
     },
     size: 100,
+  }),
+
+  columnHelper.accessor('tags', {
+    header: 'Tags',
+    cell: (info) => {
+      const tags = info.getValue();
+      if (!tags || Object.keys(tags).length === 0) {
+        return <span className="text-text-tertiary text-sm">–</span>;
+      }
+      
+      // Get the labels for tag values
+      const tagEntries = Object.entries(tags).slice(0, 2); // Show max 2 tags
+      const remaining = Object.keys(tags).length - 2;
+      
+      return (
+        <div className="flex items-center gap-1 flex-wrap">
+          {tagEntries.map(([key, value]) => {
+            // Find the tag definition to get the label
+            const tagDef = defaultCustomTags.find(t => t.key === key);
+            const valueDef = tagDef?.values.find(v => v.value === value);
+            const label = valueDef?.label || value;
+            
+            return (
+              <span 
+                key={key}
+                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-xs bg-surface-3 text-text-secondary"
+              >
+                <Tag className="h-3 w-3 text-text-tertiary" />
+                {label}
+              </span>
+            );
+          })}
+          {remaining > 0 && (
+            <span className="text-xs text-text-tertiary">
+              +{remaining}
+            </span>
+          )}
+        </div>
+      );
+    },
+    size: 150,
   }),
 
   columnHelper.accessor('createdAt', {

@@ -7,9 +7,10 @@ import type { AbsenceRequest } from '../../types/filters';
 
 interface ScopeFilterBarProps {
   data: AbsenceRequest[];
+  onManageTags: () => void;
 }
 
-export function ScopeFilterBar({ data }: ScopeFilterBarProps) {
+export function ScopeFilterBar({ data, onManageTags }: ScopeFilterBarProps) {
   const { currentUser } = useUser();
   const {
     addFilterToScope,
@@ -55,8 +56,8 @@ export function ScopeFilterBar({ data }: ScopeFilterBarProps) {
             <ScopeBranch
               scope={scope}
               filters={getFiltersForScope(scope.id)}
-              onAddFilter={(type, operator, value) => 
-                addFilterToScope(scope.id, type, operator, value)
+              onAddFilter={(type, operator, value, tagKey) => 
+                addFilterToScope(scope.id, type, operator, value, tagKey)
               }
               onUpdateFilter={(filterId, updates) => 
                 updateFilterInScope(scope.id, filterId, updates)
@@ -65,6 +66,7 @@ export function ScopeFilterBar({ data }: ScopeFilterBarProps) {
                 removeFilterFromScope(scope.id, filterId)
               }
               onClearFilters={() => clearScopeFilters(scope.id)}
+              onManageTags={onManageTags}
             />
             
             {/* OR divider between scopes */}

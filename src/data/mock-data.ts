@@ -7,7 +7,8 @@ import type {
   AbsenceRequest, 
   AbsenceStatus,
   EmploymentType,
-  FilterOption 
+  FilterOption,
+  CustomTag
 } from '../types/filters';
 
 // ==========================================
@@ -234,6 +235,57 @@ export const employees: Employee[] = [
 ];
 
 // ==========================================
+// Default Custom Tags
+// ==========================================
+export const defaultCustomTags: CustomTag[] = [
+  {
+    key: 'project',
+    label: 'Project',
+    values: [
+      { value: 'alpha', label: 'Project Alpha' },
+      { value: 'beta', label: 'Project Beta' },
+      { value: 'gamma', label: 'Project Gamma' },
+      { value: 'delta', label: 'Project Delta' },
+    ],
+    isDefault: true,
+  },
+  {
+    key: 'team',
+    label: 'Team',
+    values: [
+      { value: 'frontend', label: 'Frontend' },
+      { value: 'backend', label: 'Backend' },
+      { value: 'devops', label: 'DevOps' },
+      { value: 'mobile', label: 'Mobile' },
+      { value: 'qa', label: 'QA' },
+    ],
+    isDefault: true,
+  },
+  {
+    key: 'skill_level',
+    label: 'Skill Level',
+    values: [
+      { value: 'junior', label: 'Junior' },
+      { value: 'mid', label: 'Mid-Level' },
+      { value: 'senior', label: 'Senior' },
+      { value: 'lead', label: 'Lead' },
+    ],
+    isDefault: true,
+  },
+  {
+    key: 'office_floor',
+    label: 'Office Floor',
+    values: [
+      { value: 'floor_1', label: '1st Floor' },
+      { value: 'floor_2', label: '2nd Floor' },
+      { value: 'floor_3', label: '3rd Floor' },
+      { value: 'floor_4', label: '4th Floor' },
+    ],
+    isDefault: true,
+  },
+];
+
+// ==========================================
 // Absence Requests
 // ==========================================
 
@@ -296,6 +348,34 @@ const vacationReasons = [
   undefined,
 ];
 
+// Helper to generate random tags for an absence request
+const generateRandomTags = (): Record<string, string> | undefined => {
+  // 70% chance of having tags
+  if (Math.random() > 0.7) return undefined;
+  
+  const tags: Record<string, string> = {};
+  
+  // Randomly assign some tags
+  if (Math.random() > 0.4) {
+    const projectValues = defaultCustomTags[0].values;
+    tags.project = projectValues[Math.floor(Math.random() * projectValues.length)].value;
+  }
+  if (Math.random() > 0.5) {
+    const teamValues = defaultCustomTags[1].values;
+    tags.team = teamValues[Math.floor(Math.random() * teamValues.length)].value;
+  }
+  if (Math.random() > 0.6) {
+    const skillValues = defaultCustomTags[2].values;
+    tags.skill_level = skillValues[Math.floor(Math.random() * skillValues.length)].value;
+  }
+  if (Math.random() > 0.7) {
+    const floorValues = defaultCustomTags[3].values;
+    tags.office_floor = floorValues[Math.floor(Math.random() * floorValues.length)].value;
+  }
+  
+  return Object.keys(tags).length > 0 ? tags : undefined;
+};
+
 // Generate absence requests
 const generateAbsenceRequests = (): AbsenceRequest[] => {
   const requests: AbsenceRequest[] = [];
@@ -348,6 +428,7 @@ const generateAbsenceRequests = (): AbsenceRequest[] => {
         approver,
         createdAt,
         updatedAt: status !== 'pending' ? addDays(createdAt, Math.floor(Math.random() * 5) + 1) : createdAt,
+        tags: generateRandomTags(),
       });
       
       requestId++;

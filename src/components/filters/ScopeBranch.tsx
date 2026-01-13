@@ -1,18 +1,20 @@
-import { Plus, ChevronRight, X } from 'lucide-react';
+import { Plus, ChevronRight, X, Tag } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { LockedFilterPill } from './LockedFilterPill';
 import { FilterPill } from './FilterPill';
 import { ScopedFilterDropdown } from './ScopedFilterDropdown';
+import { TagFilterDropdown } from './TagFilterDropdown';
 import type { Filter, FilterType, FilterOperator } from '../../types/filters';
 import type { PermissionScope } from '../../types/permissions';
 
 interface ScopeBranchProps {
   scope: PermissionScope;
   filters: Filter[];
-  onAddFilter: (type: FilterType, operator: FilterOperator, value: Filter['value']) => void;
+  onAddFilter: (type: FilterType, operator: FilterOperator, value: Filter['value'], tagKey?: string) => void;
   onUpdateFilter: (filterId: string, updates: Partial<Omit<Filter, 'id'>>) => void;
   onRemoveFilter: (filterId: string) => void;
   onClearFilters: () => void;
+  onManageTags: () => void;
 }
 
 export function ScopeBranch({
@@ -22,15 +24,22 @@ export function ScopeBranch({
   onUpdateFilter,
   onRemoveFilter,
   onClearFilters,
+  onManageTags,
 }: ScopeBranchProps) {
   const hasLockedFilters = scope.requiredFilters.length > 0;
   const hasUserFilters = filters.length > 0;
 
   // Get tags that are already used (locked or in user filters) so we don't duplicate
+  // Note: custom_tag filters can be used multiple times with different tagKeys
   const usedTags = new Set<FilterType>([
     ...scope.requiredFilters.map(f => f.tag),
-    ...filters.map(f => f.type),
+    ...filters.filter(f => f.type !== 'custom_tag').map(f => f.type),
   ]);
+
+  // Handle adding a custom tag filter
+  const handleAddTagFilter = (tagKey: string, operator: FilterOperator, value: string | string[]) => {
+    onAddFilter('custom_tag', operator, value, tagKey);
+  };
 
   return (
     <div className="rounded-lg border border-border bg-surface-1/50 p-3">
@@ -97,11 +106,21 @@ export function ScopeBranch({
         >
           <Button variant="ghost" size="sm" className="gap-1.5 h-7">
             <Plus className="h-3.5 w-3.5" />
-            Add filter
+            Filter
           </Button>
         </ScopedFilterDropdown>
+
+        {/* Tags filter button */}
+        <TagFilterDropdown
+          onAddFilter={handleAddTagFilter}
+          onManageTags={onManageTags}
+        >
+          <Button variant="ghost" size="sm" className="gap-1.5 h-7">
+            <Tag className="h-3.5 w-3.5" />
+            Tags
+          </Button>
+        </TagFilterDropdown>
       </div>
     </div>
   );
 }
-

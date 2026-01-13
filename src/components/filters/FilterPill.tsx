@@ -1,9 +1,10 @@
-import { useState } from 'react';
-import { X, ChevronDown } from 'lucide-react';
+import { useState, useMemo } from 'react';
+import { X, ChevronDown, Tag } from 'lucide-react';
 import { Popover, PopoverTrigger, PopoverContent } from '../ui/Popover';
 import { ScopedFilterValueSelector } from './ScopedFilterValueSelector';
+import { Checkbox } from '../ui/Checkbox';
 import { cn } from '../../lib/cn';
-import type { Filter, FilterType, FilterOperator, DateRange } from '../../types/filters';
+import type { Filter, FilterType, FilterOperator, DateRange, FilterOption } from '../../types/filters';
 import { filterTypeConfig, operatorLabels, statusOptions, employmentTypeOptions } from '../../types/filters';
 import { 
   departmentOptions, 
@@ -14,6 +15,15 @@ import {
 } from '../../data/mock-data';
 import { getFilterDisplayValue } from '../../lib/filter-utils';
 import { useUser } from '../../context/UserContext';
+import { useCustomTags } from '../../hooks/useCustomTags';
+import {
+  Command,
+  CommandInput,
+  CommandList,
+  CommandEmpty,
+  CommandGroup,
+  CommandItem,
+} from '../ui/Command';
 
 interface FilterPillProps {
   filter: Filter;
@@ -26,6 +36,10 @@ export function FilterPill({ filter, onUpdate, onRemove, scopeId }: FilterPillPr
   const [editOpen, setEditOpen] = useState(false);
   const [operatorOpen, setOperatorOpen] = useState(false);
   const { currentUser } = useUser();
+  const { getTagByKey } = useCustomTags();
+  
+  const isCustomTag = filter.type === 'custom_tag';
+  const customTag = isCustomTag && filter.tagKey ? getTagByKey(filter.tagKey) : null;
   const config = filterTypeConfig[filter.type];
   
   // Get the scope if scopeId is provided
@@ -33,7 +47,17 @@ export function FilterPill({ filter, onUpdate, onRemove, scopeId }: FilterPillPr
     ? currentUser.scopes.find(s => s.id === scopeId)
     : currentUser.scopes[0]; // Default to first scope
   
-  const displayValue = getFilterDisplayValue(filter, getOptionsForType(filter.type));
+  // Get the label for the filter
+  const filterLabel = isCustomTag && customTag 
+    ? customTag.label 
+    : config.label;
+  
+  // Get options for value display
+  const options = isCustomTag && customTag
+    ? customTag.values.map(v => ({ value: v.value, label: v.label }))
+    : getOptionsForType(filter.type);
+    
+  const displayValue = getFilterDisplayValue(filter, options);
 
   const handleOperatorChange = (operator: FilterOperator) => {
     onUpdate({ operator });
@@ -47,8 +71,9 @@ export function FilterPill({ filter, onUpdate, onRemove, scopeId }: FilterPillPr
   return (
     <div className="group inline-flex items-center gap-0.5 rounded-md bg-surface-2 border border-border text-sm h-7 animate-in fade-in-0 zoom-in-95 duration-150">
       {/* Filter type label */}
-      <span className="pl-2.5 pr-1 text-text-secondary font-medium">
-        {config.label}
+      <span className="pl-2.5 pr-1 text-text-secondary font-medium flex items-center gap-1.5">
+        {isCustomTag && <Tag className="h-3 w-3 text-text-tertiary" />}
+        {filterLabel}
       </span>
 
       {/* Operator selector */}
@@ -97,7 +122,13 @@ export function FilterPill({ filter, onUpdate, onRemove, scopeId }: FilterPillPr
           </button>
         </PopoverTrigger>
         <PopoverContent className="w-[280px] p-0" align="start">
-          {scope && (
+          {isCustomTag && customTag ? (
+            <CustomTagValueSelector
+              tag={customTag}
+              value={filter.value}
+              onChange={handleValueChange}
+            />
+          ) : scope ? (
             <ScopedFilterValueSelector
               filterType={filter.type}
               operator={filter.operator}
@@ -105,7 +136,7 @@ export function FilterPill({ filter, onUpdate, onRemove, scopeId }: FilterPillPr
               scope={scope}
               onChange={handleValueChange}
             />
-          )}
+          ) : null}
         </PopoverContent>
       </Popover>
 
@@ -124,7 +155,72 @@ export function FilterPill({ filter, onUpdate, onRemove, scopeId }: FilterPillPr
   );
 }
 
-function getOptionsForType(type: FilterType) {
+// Custom tag value selector component
+interface CustomTagValueSelectorProps {
+  tag: { key: string; label: string; values: { value: string; label: string }[] };
+  value: Filter['value'];
+  onChange: (value: string | string[]) => void;
+}
+
+function CustomTagValueSelector({ tag, value, onChange }: CustomTagValueSelectorProps) {
+  const [search, setSearch] = useState('');
+  
+  const selectedValues = Array.isArray(value) 
+    ? value 
+    : typeof value === 'string' 
+      ? [value] 
+      : [];
+
+  const filteredValues = useMemo(() => {
+    if (!search) return tag.values;
+    return tag.values.filter(v =>
+      v.label.toLowerCase().includes(search.toLowerCase())
+    );
+  }, [tag.values, search]);
+
+  const handleToggle = (val: string) => {
+    const newValues = selectedValues.includes(val)
+      ? selectedValues.filter(v => v !== val)
+      : [...selectedValues, val];
+    onChange(newValues.length === 1 ? newValues[0] : newValues);
+  };
+
+  return (
+    <Command>
+      <CommandInput
+        placeholder="Search values..."
+        value={search}
+        onValueChange={setSearch}
+      />
+      <CommandList>
+        <CommandEmpty>No values found.</CommandEmpty>
+        <CommandGroup>
+          {filteredValues.map((v) => {
+            const isSelected = selectedValues.includes(v.value);
+            return (
+              <CommandItem
+                key={v.value}
+                value={v.value}
+                onSelect={() => handleToggle(v.value)}
+                className="gap-2"
+              >
+                <Checkbox
+                  checked={isSelected}
+                  className="pointer-events-none"
+                />
+                <span className={cn('flex-1', isSelected && 'font-medium')}>
+                  {v.label}
+                </span>
+              </CommandItem>
+            );
+          })}
+        </CommandGroup>
+      </CommandList>
+    </Command>
+  );
+}
+
+function getOptionsForType(type: FilterType): FilterOption[] {
   switch (type) {
     case 'status':
       return statusOptions;

@@ -12,7 +12,7 @@ export interface ScopeFilters {
 
 interface UseScopedFiltersReturn {
   scopeFilters: ScopeFilters[];
-  addFilterToScope: (scopeId: string, type: FilterType, operator: FilterOperator, value: Filter['value']) => void;
+  addFilterToScope: (scopeId: string, type: FilterType, operator: FilterOperator, value: Filter['value'], tagKey?: string) => void;
   updateFilterInScope: (scopeId: string, filterId: string, updates: Partial<Omit<Filter, 'id'>>) => void;
   removeFilterFromScope: (scopeId: string, filterId: string) => void;
   clearScopeFilters: (scopeId: string) => void;
@@ -45,13 +45,15 @@ export function useScopedFilters(initialScopes: PermissionScope[]): UseScopedFil
     scopeId: string,
     type: FilterType,
     operator: FilterOperator,
-    value: Filter['value']
+    value: Filter['value'],
+    tagKey?: string
   ) => {
     const newFilter: Filter = {
       id: generateFilterId(),
       type,
       operator,
       value,
+      ...(tagKey && { tagKey }),
     };
     setScopeFilters(prev => prev.map(sf =>
       sf.scopeId === scopeId

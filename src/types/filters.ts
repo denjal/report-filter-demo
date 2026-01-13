@@ -18,7 +18,8 @@ export type FilterType =
   | 'manager'
   | 'employment_type'
   | 'start_date' 
-  | 'end_date';
+  | 'end_date'
+  | 'custom_tag';
 
 // Date range for date filters
 export interface DateRange {
@@ -32,6 +33,25 @@ export interface Filter {
   type: FilterType;
   operator: FilterOperator;
   value: string | string[] | DateRange;
+  tagKey?: string; // Used when type is 'custom_tag' to specify which tag
+}
+
+// ==========================================
+// Custom Tags
+// ==========================================
+
+// A value option within a custom tag
+export interface CustomTagValue {
+  value: string;
+  label: string;
+}
+
+// A custom tag definition (key with possible values)
+export interface CustomTag {
+  key: string;           // Unique identifier, e.g., "project"
+  label: string;         // Display name, e.g., "Project"
+  values: CustomTagValue[];
+  isDefault?: boolean;   // True for pre-defined tags, false for user-created
 }
 
 // Filter type metadata
@@ -113,6 +133,7 @@ export interface AbsenceRequest {
   approver?: Employee;
   createdAt: Date;
   updatedAt: Date;
+  tags?: Record<string, string>; // Custom tags as key:value pairs, e.g., { project: "alpha", team: "frontend" }
 }
 
 // ==========================================
@@ -202,6 +223,13 @@ export const filterTypeConfig: Record<FilterType, FilterTypeMeta> = {
     icon: 'calendar-check',
     operators: ['before', 'after', 'between'],
     valueType: 'date',
+  },
+  custom_tag: {
+    type: 'custom_tag',
+    label: 'Tags',
+    icon: 'tag',
+    operators: ['is', 'is_not', 'is_any_of', 'is_none_of'],
+    valueType: 'multi',
   },
 };
 
