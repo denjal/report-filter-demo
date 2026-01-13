@@ -1,9 +1,8 @@
-import { Plus, ChevronRight, X, Tag } from 'lucide-react';
+import { Plus, ChevronRight, X } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { LockedFilterPill } from './LockedFilterPill';
 import { FilterPill } from './FilterPill';
 import { ScopedFilterDropdown } from './ScopedFilterDropdown';
-import { TagFilterDropdown } from './TagFilterDropdown';
 import type { Filter, FilterType, FilterOperator } from '../../types/filters';
 import type { PermissionScope } from '../../types/permissions';
 
@@ -26,7 +25,6 @@ export function ScopeBranch({
   onClearFilters,
   onManageTags,
 }: ScopeBranchProps) {
-  const hasLockedFilters = scope.requiredFilters.length > 0;
   const hasUserFilters = filters.length > 0;
 
   // Get tags that are already used (locked or in user filters) so we don't duplicate
@@ -36,38 +34,8 @@ export function ScopeBranch({
     ...filters.filter(f => f.type !== 'custom_tag').map(f => f.type),
   ]);
 
-  // Handle adding a custom tag filter
-  const handleAddTagFilter = (tagKey: string, operator: FilterOperator, value: string | string[]) => {
-    onAddFilter('custom_tag', operator, value, tagKey);
-  };
-
   return (
     <div className="rounded-lg border border-border bg-surface-1/50 p-3">
-      {/* Scope header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-medium text-text-tertiary uppercase tracking-wider">
-            {scope.name}
-          </span>
-          {hasLockedFilters && (
-            <span className="text-xs text-text-tertiary">
-              ({scope.requiredFilters.length} required)
-            </span>
-          )}
-        </div>
-        {hasUserFilters && (
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={onClearFilters}
-            className="text-text-tertiary hover:text-text-secondary h-6 px-2 text-xs"
-          >
-            <X className="h-3 w-3 mr-1" />
-            Clear
-          </Button>
-        )}
-      </div>
-
       {/* Filter chain */}
       <div className="flex items-center gap-2 flex-wrap">
         {/* Locked/Required filters */}
@@ -76,6 +44,7 @@ export function ScopeBranch({
             <LockedFilterPill
               tag={rf.tag}
               valueLabel={rf.label}
+              tagKey={rf.tagKey}
             />
             {(idx < scope.requiredFilters.length - 1 || hasUserFilters || true) && (
               <ChevronRight className="h-4 w-4 text-text-tertiary" />
@@ -103,6 +72,7 @@ export function ScopeBranch({
           scope={scope}
           usedTags={usedTags}
           onAddFilter={onAddFilter}
+          onManageTags={onManageTags}
         >
           <Button variant="ghost" size="sm" className="gap-1.5 h-7">
             <Plus className="h-3.5 w-3.5" />
@@ -110,16 +80,18 @@ export function ScopeBranch({
           </Button>
         </ScopedFilterDropdown>
 
-        {/* Tags filter button */}
-        <TagFilterDropdown
-          onAddFilter={handleAddTagFilter}
-          onManageTags={onManageTags}
-        >
-          <Button variant="ghost" size="sm" className="gap-1.5 h-7">
-            <Tag className="h-3.5 w-3.5" />
-            Tags
+        {/* Clear button - show only when there are user filters */}
+        {hasUserFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className="text-text-tertiary hover:text-text-secondary h-7 px-2 text-xs"
+          >
+            <X className="h-3 w-3 mr-1" />
+            Clear
           </Button>
-        </TagFilterDropdown>
+        )}
       </div>
     </div>
   );

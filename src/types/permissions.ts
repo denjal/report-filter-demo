@@ -5,6 +5,7 @@ export interface RequiredFilter {
   tag: FilterType;
   value: string; // Single value, locked to this
   label: string; // Display label
+  tagKey?: string; // For custom_tag type, specifies which tag key
 }
 
 // A tag where user has limited options (not locked, but restricted to certain values)
@@ -79,6 +80,7 @@ export const testUsers: TestUser[] = [
         name: 'HR Scope',
         requiredFilters: [
           { tag: 'department', value: 'dept-4', label: 'Human Resources' },
+          { tag: 'custom_tag', value: 'alpha', label: 'Project Alpha', tagKey: 'project' },
         ],
         // No location restriction - can see all locations for HR
         restrictedTags: [

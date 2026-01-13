@@ -120,6 +120,7 @@ export function useScopedFilters(initialScopes: PermissionScope[]): UseScopedFil
           type: rf.tag,
           operator: 'is' as FilterOperator,
           value: rf.value,
+          ...(rf.tagKey && { tagKey: rf.tagKey }),
         })),
         // User-added filters
         ...(scopeFilter?.filters ?? []),

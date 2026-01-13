@@ -243,7 +243,7 @@ button, a, input, select, textarea {
 /* Command item hover effect */
 [cmdk-item][data-selected="true"] {
   transition: background-color 100ms ease;
-}
+  }
 
 /* Checkbox animation */
 [data-state="checked"] .lucide-check {
@@ -253,7 +253,7 @@ button, a, input, select, textarea {
 /* Filter pill entrance animation */
 .filter-pill-enter {
   animation: scaleIn var(--animate-duration-fast) ease-out;
-}
+  }
 
 /* Table empty state */
 .empty-state {

@@ -36,7 +36,7 @@ function AppContent() {
               <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center">
                 <CalendarDays className="h-5 w-5 text-accent" />
               </div>
-              <div>
+      <div>
                 <h1 className="text-lg font-semibold text-text-primary">Absence Manager</h1>
                 <p className="text-sm text-text-tertiary">HR Time & Absence Reporting</p>
               </div>
@@ -55,7 +55,7 @@ function AppContent() {
               <UserSelector />
             </div>
           </div>
-        </div>
+      </div>
       </header>
 
       {/* Main content */}
@@ -73,8 +73,8 @@ function AppContent() {
                 {currentUser.description}
                 {' · '}
                 {currentUser.scopes.length} access scope{currentUser.scopes.length !== 1 ? 's' : ''}
-              </p>
-            </div>
+        </p>
+      </div>
             {hasActiveFilters && (
               <Button
                 variant="ghost"
