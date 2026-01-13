@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+@theme {
+  /* Base colors - will be overridden by light/dark mode */
+  --color-surface-0: #0a0a0b;
+  --color-surface-1: #111113;
+  --color-surface-2: #18181b;
+  --color-surface-3: #212124;
+  --color-surface-4: #2a2a2e;
+  
+  --color-border: #27272a;
+  --color-border-hover: #3f3f46;
+  
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+  
+  /* Absence Status colors */
+  --color-status-pending: #fbbf24;
+  --color-status-approved: #22c55e;
+  --color-status-rejected: #ef4444;
+  --color-status-cancelled: #71717a;
+  
+  /* Employment Type colors */
+  --color-employment-fulltime: #3b82f6;
+  --color-employment-parttime: #8b5cf6;
+  --color-employment-contractor: #f97316;
+  
+  /* Department colors */
+  --color-dept-engineering: #3b82f6;
+  --color-dept-product: #8b5cf6;
+  --color-dept-design: #ec4899;
+  --color-dept-hr: #22c55e;
+  --color-dept-finance: #eab308;
+  --color-dept-sales: #f97316;
+  --color-dept-marketing: #06b6d4;
+  --color-dept-operations: #6b7280;
+  
+  /* Location colors */
+  --color-loc-stockholm: #3b82f6;
+  --color-loc-gothenburg: #22c55e;
+  --color-loc-malmo: #8b5cf6;
+  --color-loc-remote: #71717a;
+
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+
+  /* Animation durations */
+  --animate-duration-fast: 150ms;
+  --animate-duration-normal: 200ms;
+  --animate-duration-slow: 300ms;
+}
+
+/* Dark theme (default) */
+:root,
+[data-theme="dark"] {
+  --color-surface-0: #0a0a0b;
+  --color-surface-1: #111113;
+  --color-surface-2: #18181b;
+  --color-surface-3: #212124;
+  --color-surface-4: #2a2a2e;
+  
+  --color-border: #27272a;
+  --color-border-hover: #3f3f46;
+  
+  --color-text-primary: #fafafa;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  
+  --color-accent: #6366f1;
+  --color-accent-hover: #818cf8;
+
+  color-scheme: dark;
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --color-surface-0: #ffffff;
+  --color-surface-1: #f9fafb;
+  --color-surface-2: #f3f4f6;
+  --color-surface-3: #e5e7eb;
+  --color-surface-4: #d1d5db;
+  
+  --color-border: #e5e7eb;
+  --color-border-hover: #d1d5db;
+  
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-text-tertiary: #9ca3af;
+  
+  --color-accent: #4f46e5;
+  --color-accent-hover: #6366f1;
+
+  color-scheme: light;
+}
+
+/* Light theme status color adjustments for better contrast */
+[data-theme="light"] {
+  --color-status-pending: #d97706;
+  --color-status-approved: #16a34a;
+  --color-status-rejected: #dc2626;
+  --color-status-cancelled: #6b7280;
+}
+
+/* Keyframes */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideInFromTop {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes slideInFromBottom {
+  from { transform: translateY(8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn var(--animate-duration-fast) ease-out;
+}
+
+.animate-fade-out {
+  animation: fadeOut var(--animate-duration-fast) ease-out;
+}
+
+.animate-slide-in-top {
+  animation: slideInFromTop var(--animate-duration-normal) ease-out;
+}
+
+.animate-slide-in-bottom {
+  animation: slideInFromBottom var(--animate-duration-normal) ease-out;
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--animate-duration-normal) ease-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Base styles */
+body {
+  @apply bg-surface-0 text-text-primary antialiased;
+  font-family: var(--font-sans);
+  transition: background-color 200ms ease, color 200ms ease;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Selection color */
+::selection {
+  background-color: rgba(99, 102, 241, 0.3);
+  color: inherit;
+}
+
+/* Focus visible ring for keyboard navigation */
+*:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar - dark mode */
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-surface-4);
+  border-radius: 9999px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Custom scrollbar - light mode */
+[data-theme="light"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: var(--color-surface-4);
+  border-radius: 9999px;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-hover);
+}
+
+/* Table row hover effect enhancement */
+tr {
+  transition: background-color 150ms ease;
+}
+
+/* Smooth transitions on interactive elements */
+button, a, input, select, textarea {
+  transition: all 150ms ease;
+}
+
+/* Popover animations via data attributes (Radix) */
+[data-state="open"] {
+  animation: scaleIn var(--animate-duration-fast) ease-out;
+}
+
+[data-state="closed"] {
+  animation: fadeOut var(--animate-duration-fast) ease-out;
+}
+
+/* Command item hover effect */
+[cmdk-item][data-selected="true"] {
+  transition: background-color 100ms ease;
+}
+
+/* Checkbox animation */
+[data-state="checked"] .lucide-check {
+  animation: scaleIn 100ms ease-out;
+}
+
+/* Filter pill entrance animation */
+.filter-pill-enter {
+  animation: scaleIn var(--animate-duration-fast) ease-out;
+}
+
+/* Table empty state */
+.empty-state {
+  animation: fadeIn var(--animate-duration-slow) ease-out;
+}
